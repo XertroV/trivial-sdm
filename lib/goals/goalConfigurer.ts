@@ -14,8 +14,8 @@
  * limitations under the License.
  */
 
-import { GoalConfigurer, Version } from "@atomist/sdm-core";
-import { HelloWorldGoals, DockerBuildGoals, AllDefinedGoals } from "./goals";
+import { GoalConfigurer, Version, goalScheduling } from "@atomist/sdm-core";
+import { HelloWorldGoals, DockerBuildGoals, AllDefinedGoals, DockerDeployGoals } from "./goals";
 
 /**
  * Configure the SDM and add fulfillments or listeners to the created goals
@@ -42,10 +42,16 @@ export const DockerBuildGoalConfigurer: GoalConfigurer<DockerBuildGoals> = async
     goals.dockerBuild.with({ push: false });
 }
 
+export const DockerDeployGoalConfigurer: GoalConfigurer<DockerDeployGoals> = async (sdm, goals) => {
+    // sourcePort is the port is the "exposed port in the Dockerfile to be mapped externally"
+    goals.dockerDeploy.with({ name: 'test-docker-deployment', successPatterns: [/.*/], sourcePort: 2866 })
+}
+
 export const AllDefinedGoalConfigurers: GoalConfigurer<AllDefinedGoals> = async (sdm, goals) => {
     const configurers = 
         [ HelloWorldGoalConfigurer
         , DockerBuildGoalConfigurer
+        , DockerDeployGoalConfigurer
         ];
     await Promise.all(configurers.map(c => c(sdm, goals)))
 }

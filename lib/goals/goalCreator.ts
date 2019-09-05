@@ -16,8 +16,8 @@
 
 import { goal } from "@atomist/sdm";
 import { GoalCreator, Version } from "@atomist/sdm-core";
-import { HelloWorldGoals, DockerBuildGoals, AllDefinedGoals } from "./goals";
-import { DockerBuild } from "@atomist/sdm-pack-docker";
+import { HelloWorldGoals, DockerBuildGoals, AllDefinedGoals, DockerDeployGoals } from "./goals";
+import { DockerBuild, DockerDeploy } from "@atomist/sdm-pack-docker";
 
 /**
  * Create all goal instances and return an instance of HelloWorldGoals
@@ -35,8 +35,14 @@ export const HelloWorldGoalCreator: GoalCreator<HelloWorldGoals> = async sdm => 
 
 export const DockerBuildGoalCreator: GoalCreator<DockerBuildGoals> = async sdm => {
     return {
-        dockerVersioning: new Version(),
-        dockerBuild: new DockerBuild()
+        dockerVersioning: new Version({ displayName: "docker-version" }),
+        dockerBuild: new DockerBuild({ displayName: "docker-build" }),
+    }
+}
+
+export const DockerDeployGoalCreator: GoalCreator<DockerDeployGoals> = async sdm => {
+    return {
+        dockerDeploy: new DockerDeploy({ displayName: "docker-deploy" }),
     }
 }
 
@@ -45,5 +51,6 @@ export const AllDefinedGoalsCreator: GoalCreator<AllDefinedGoals> = async sdm =>
     return {
         ...(await HelloWorldGoalCreator(sdm)),
         ...(await DockerBuildGoalCreator(sdm)),
+        ...(await DockerDeployGoalCreator(sdm)),
     }
 }

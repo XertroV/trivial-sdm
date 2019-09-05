@@ -42,18 +42,20 @@ export const configuration = configure<AllDefinedGoals>(async (sdm) => {
     return {
         hello: {
             test: AnyPush,
-            goals: goals.helloWorld,
+            goals: [],
         },
         dockerBuild: {
-            // test: HasDockerfile,
+            test: HasDockerfile,
             goals: [
-                [goals.dockerVersioning, goals.helloWorld],
+                [goals.dockerVersioning],
                 [goals.dockerBuild],
             ]
         },
-        k8sDeploy: {
-            after: ["dockerBuild"],
-            goals: goals.k8sDeploy,
+        dockerDeploy: {
+            dependsOn: ["dockerBuild"],
+            goals: [
+                [goals.dockerDeploy],
+            ],
         }
     };
 });

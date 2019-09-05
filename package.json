@@ -30,7 +30,8 @@
     "@atomist/sdm-core": "^1.6.1",
     "@atomist/sdm-pack-docker": "^2.0.2",
     "@atomist/sdm-pack-fingerprint": "^5.0.0-master.20190903062633",
-    "@atomist/sdm-pack-fingerprints": "^4.0.4"
+    "@atomist/sdm-pack-fingerprints": "^4.0.4",
+    "@atomist/sdm-pack-k8s": "^1.9.0"
   },
   "devDependencies": {
     "@atomist/sdm-local": "^1.2.0",
