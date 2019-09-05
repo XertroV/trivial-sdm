@@ -39,7 +39,17 @@ export const HelloWorldGoalConfigurer: GoalConfigurer<HelloWorldGoals> = async (
 
 export const DockerBuildGoalConfigurer: GoalConfigurer<DockerBuildGoals> = async (sdm, goals) => {
     goals.dockerVersioning.with({versioner: async (v) => { return v.sha }});
-    goals.dockerBuild.with({ push: false });
+    goals.dockerBuild.with({ 
+        push: false, 
+        dockerImageNameCreator: async (gitProject, event, dockerOptions) => {
+            const shortSha = event.sha.slice(0,16)
+            return [{
+                registry: "",
+                name: `${event.repo.owner}-${event.repo.name}`,
+                tags: [shortSha]
+            }]
+        } 
+    });
 }
 
 export const DockerDeployGoalConfigurer: GoalConfigurer<DockerDeployGoals> = async (sdm, goals) => {
