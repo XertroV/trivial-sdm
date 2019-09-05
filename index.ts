@@ -40,10 +40,6 @@ export const configuration = configure<AllDefinedGoals>(async (sdm) => {
 
     // Return all push rules
     return {
-        hello: {
-            test: AnyPush,
-            goals: [],
-        },
         dockerBuild: {
             test: HasDockerfile,
             goals: [

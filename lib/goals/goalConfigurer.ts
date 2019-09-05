@@ -42,11 +42,11 @@ export const DockerBuildGoalConfigurer: GoalConfigurer<DockerBuildGoals> = async
     goals.dockerBuild.with({ 
         push: false, 
         dockerImageNameCreator: async (gitProject, event, dockerOptions) => {
-            const shortSha = event.sha.slice(0,16)
+            const shortSha = event.sha.slice(0,16);
             return [{
                 registry: "",
-                name: `${event.repo.owner}-${event.repo.name}`,
-                tags: [shortSha]
+                name: `${event.repo.owner.toLowerCase()}-${event.repo.name.toLowerCase()}`,
+                tags: [shortSha, `${Date.now()}`],
             }]
         } 
     });
@@ -54,13 +54,12 @@ export const DockerBuildGoalConfigurer: GoalConfigurer<DockerBuildGoals> = async
 
 export const DockerDeployGoalConfigurer: GoalConfigurer<DockerDeployGoals> = async (sdm, goals) => {
     // sourcePort is the port is the "exposed port in the Dockerfile to be mapped externally"
-    goals.dockerDeploy.with({ name: 'test-docker-deployment', successPatterns: [/.*/], sourcePort: 2866 })
+    goals.dockerDeploy.with({ name: 'test-docker-deployment', successPatterns: [/Atomist automation client startup completed/], sourcePort: 2866 })
 }
 
 export const AllDefinedGoalConfigurers: GoalConfigurer<AllDefinedGoals> = async (sdm, goals) => {
     const configurers = 
-        [ HelloWorldGoalConfigurer
-        , DockerBuildGoalConfigurer
+        [ DockerBuildGoalConfigurer
         , DockerDeployGoalConfigurer
         ];
     await Promise.all(configurers.map(c => c(sdm, goals)))

@@ -37,4 +37,4 @@ export interface DockerDeployGoals extends AllGoals {
     dockerDeploy: DockerDeploy;
 }
 
-export interface AllDefinedGoals extends DockerBuildGoals, HelloWorldGoals, DockerDeployGoals {}
+export interface AllDefinedGoals extends DockerBuildGoals, DockerDeployGoals {}
