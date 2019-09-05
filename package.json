@@ -1,5 +1,5 @@
 {
-  "name": "@atomist-seeds/empty-sdm",
+  "name": "trivial-sdm",
   "version": "1.0.0",
   "description": "An empty SDM to use as a starting point for your own software delivery machine",
   "author": {

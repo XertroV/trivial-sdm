@@ -16,8 +16,9 @@
 
 import { goal } from "@atomist/sdm";
 import { GoalCreator, Version } from "@atomist/sdm-core";
-import { HelloWorldGoals, DockerBuildGoals, AllDefinedGoals, DockerDeployGoals } from "./goals";
+import { HelloWorldGoals, DockerBuildGoals, AllDefinedGoals, DockerDeployGoals, K8sDeployGoals } from "./goals";
 import { DockerBuild, DockerDeploy, DockerPerBranchDeployer } from "@atomist/sdm-pack-docker";
+import { KubernetesDeploy } from "@atomist/sdm-pack-k8s";
 
 /**
  * Create all goal instances and return an instance of HelloWorldGoals
@@ -46,11 +47,18 @@ export const DockerDeployGoalCreator: GoalCreator<DockerDeployGoals> = async sdm
     }
 }
 
+export const K8sDeployGoalCreator: GoalCreator<K8sDeployGoals> = async sdm => {
+    return {
+        k8sDeploy: new KubernetesDeploy({ displayName: "k8s deploy", uniqueName: "k8s-deploy", environment: "tmp-env" })
+    }
+}
+
 
 export const AllDefinedGoalsCreator: GoalCreator<AllDefinedGoals> = async sdm => {
     return {
         // ...(await HelloWorldGoalCreator(sdm)),
         ...(await DockerBuildGoalCreator(sdm)),
         ...(await DockerDeployGoalCreator(sdm)),
+        ...(await K8sDeployGoalCreator(sdm)),
     }
 }

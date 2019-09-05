@@ -17,6 +17,7 @@
 import { GoalWithFulfillment } from "@atomist/sdm";
 import { AllGoals, Version } from "@atomist/sdm-core";
 import { DockerBuild, DockerDeploy } from "@atomist/sdm-pack-docker";
+import { KubernetesDeploy } from "@atomist/sdm-pack-k8s";
 
 /**
  * Interface to capture all goals that this SDM will manage
@@ -37,4 +38,8 @@ export interface DockerDeployGoals extends AllGoals {
     dockerDeploy: DockerDeploy;
 }
 
-export interface AllDefinedGoals extends DockerBuildGoals, DockerDeployGoals {}
+export interface K8sDeployGoals extends AllGoals {
+    k8sDeploy: KubernetesDeploy;
+}
+
+export interface AllDefinedGoals extends DockerBuildGoals, DockerDeployGoals, K8sDeployGoals {}

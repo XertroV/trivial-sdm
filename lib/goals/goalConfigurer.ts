@@ -15,7 +15,7 @@
  */
 
 import { GoalConfigurer, Version, goalScheduling } from "@atomist/sdm-core";
-import { HelloWorldGoals, DockerBuildGoals, AllDefinedGoals, DockerDeployGoals } from "./goals";
+import { HelloWorldGoals, DockerBuildGoals, AllDefinedGoals, DockerDeployGoals, K8sDeployGoals } from "./goals";
 
 /**
  * Configure the SDM and add fulfillments or listeners to the created goals
@@ -46,7 +46,7 @@ export const DockerBuildGoalConfigurer: GoalConfigurer<DockerBuildGoals> = async
             return [{
                 registry: "",
                 name: `${event.repo.owner.toLowerCase()}-${event.repo.name.toLowerCase()}`,
-                tags: [shortSha, `${Date.now()}`],
+                tags: [shortSha, `${Date.now()}`, 'latest'],
             }]
         } 
     });
@@ -54,13 +54,60 @@ export const DockerBuildGoalConfigurer: GoalConfigurer<DockerBuildGoals> = async
 
 export const DockerDeployGoalConfigurer: GoalConfigurer<DockerDeployGoals> = async (sdm, goals) => {
     // sourcePort is the port is the "exposed port in the Dockerfile to be mapped externally"
-    goals.dockerDeploy.with({ name: 'test-docker-deployment', successPatterns: [/Atomist automation client startup completed/], sourcePort: 2866 })
+    goals.dockerDeploy.with({ name: 'docker-deploy-t soemthing', successPatterns: [/starting server/], sourcePort: 2866 })
 }
+
+export const K8sDeployGoalConfigurer: GoalConfigurer<K8sDeployGoals> = async (sdm, goals) => {
+    goals.k8sDeploy.with({
+        applicationData: async (ka, gp, kd, sge, ctx) => {
+            const annotations = {
+                "kubernetes.io/ingress.class": "nginx",
+                "nginx.ingress.kubernetes.io/rewrite-target": "/",
+                "nginx.ingress.kubernetes.io/ssl-redirect": "false",
+            }
+            // ka.ingressSpec = {
+            //     metadata:
+            //     {
+            //         annotations: {
+            //             "kubernetes.io / ingress.class": "nginx",
+            //             "nginx.ingress.kubernetes.io / rewrite - target": "/",
+            //             "nginx.ingress.kubernetes.io / ssl - redirect": "false",
+            //         }
+            //     }
+            // }
+
+            ka.ingressSpec = {}
+            ka.ingressSpec.metadata = {annotations}
+            return {
+                ...ka,
+                workspaceId: ka.workspaceId, // "test-workspace",
+                image: `${sge.repo.owner.toLowerCase()}-${sge.repo.name.toLowerCase()}`,
+                ns: "ns2",
+                name: gp.name,
+                port: 2866,
+                path: `/${gp.name}`,
+                deploymentSpec: {
+                    spec: {
+                        template: {
+                            spec: {
+                                containers:
+                                    [{ imagePullPolicy: "Never" }],
+                                
+                            }
+                        }
+                    }
+                },
+            }
+        } 
+    })
+}
+
 
 export const AllDefinedGoalConfigurers: GoalConfigurer<AllDefinedGoals> = async (sdm, goals) => {
     const configurers = 
         [ DockerBuildGoalConfigurer
         , DockerDeployGoalConfigurer
+        , K8sDeployGoalConfigurer
         ];
     await Promise.all(configurers.map(c => c(sdm, goals)))
 }
