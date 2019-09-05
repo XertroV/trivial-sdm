@@ -15,7 +15,8 @@
  */
 
 import { GoalWithFulfillment } from "@atomist/sdm";
-import { AllGoals } from "@atomist/sdm-core";
+import { AllGoals, Version } from "@atomist/sdm-core";
+import { DockerBuild } from "@atomist/sdm-pack-docker";
 
 /**
  * Interface to capture all goals that this SDM will manage
@@ -26,3 +27,10 @@ export interface HelloWorldGoals extends AllGoals {
     helloWorld: GoalWithFulfillment;
 
 }
+
+export interface DockerBuildGoals extends AllGoals {
+    dockerBuild: DockerBuild;
+    dockerVersioning: Version;
+}
+
+export interface AllDefinedGoals extends DockerBuildGoals, HelloWorldGoals {}

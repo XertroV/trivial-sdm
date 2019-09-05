@@ -14,8 +14,8 @@
  * limitations under the License.
  */
 
-import { GoalConfigurer } from "@atomist/sdm-core";
-import { HelloWorldGoals } from "./goals";
+import { GoalConfigurer, Version } from "@atomist/sdm-core";
+import { HelloWorldGoals, DockerBuildGoals, AllDefinedGoals } from "./goals";
 
 /**
  * Configure the SDM and add fulfillments or listeners to the created goals
@@ -36,3 +36,16 @@ export const HelloWorldGoalConfigurer: GoalConfigurer<HelloWorldGoals> = async (
     });
 
 };
+
+export const DockerBuildGoalConfigurer: GoalConfigurer<DockerBuildGoals> = async (sdm, goals) => {
+    goals.dockerVersioning.with({versioner: async (v) => { return v.sha }});
+    goals.dockerBuild.with({ push: false });
+}
+
+export const AllDefinedGoalConfigurers: GoalConfigurer<AllDefinedGoals> = async (sdm, goals) => {
+    const configurers = 
+        [ HelloWorldGoalConfigurer
+        , DockerBuildGoalConfigurer
+        ];
+    await Promise.all(configurers.map(c => c(sdm, goals)))
+}

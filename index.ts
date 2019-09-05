@@ -14,16 +14,17 @@
  * limitations under the License.
  */
 
-import { AnyPush } from "@atomist/sdm";
+import { AnyPush, SoftwareDeliveryMachineConfiguration, SoftwareDeliveryMachine, or, IsPushToBranchWithPullRequest, and } from "@atomist/sdm";
 import { configure } from "@atomist/sdm-core";
-import { HelloWorldGoalConfigurer } from "./lib/goals/goalConfigurer";
-import { HelloWorldGoalCreator } from "./lib/goals/goalCreator";
-import { HelloWorldGoals } from "./lib/goals/goals";
+import { HelloWorldGoalConfigurer, AllDefinedGoalConfigurers } from "./lib/goals/goalConfigurer";
+import { HelloWorldGoalCreator, AllDefinedGoalsCreator } from "./lib/goals/goalCreator";
+import { HelloWorldGoals, AllDefinedGoals } from "./lib/goals/goals";
+import { HasDockerfile } from "@atomist/sdm-pack-docker";
 
 /**
  * The main entry point into the SDM
  */
-export const configuration = configure<HelloWorldGoals>(async sdm => {
+export const configuration = configure<AllDefinedGoals>(async (sdm) => {
 
     // Use the sdm instance to configure commands etc
     sdm.addCommand({
@@ -35,7 +36,7 @@ export const configuration = configure<HelloWorldGoals>(async sdm => {
     });
 
     // Create goals and configure them
-    const goals = await sdm.createGoals(HelloWorldGoalCreator, [HelloWorldGoalConfigurer]);
+    const goals = await sdm.createGoals(AllDefinedGoalsCreator, [AllDefinedGoalConfigurers]);
 
     // Return all push rules
     return {
@@ -43,5 +44,16 @@ export const configuration = configure<HelloWorldGoals>(async sdm => {
             test: AnyPush,
             goals: goals.helloWorld,
         },
+        dockerBuild: {
+            // test: HasDockerfile,
+            goals: [
+                [goals.dockerVersioning, goals.helloWorld],
+                [goals.dockerBuild],
+            ]
+        },
+        k8sDeploy: {
+            after: ["dockerBuild"],
+            goals: goals.k8sDeploy,
+        }
     };
 });
