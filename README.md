@@ -1,8 +1,24 @@
-<p align="center">
-  <img src="https://images.atomist.com/sdm/SDM-Logo-Dark.png">
-</p>
+# trivial-sdm (based on @atomist-seeds/empty-sdm)
 
-# @atomist-seeds/empty-sdm
+## Getting Started
+
+Please make sure you have installed:
+
+* node + npm
+* docker
+* minikube
+
+### Configuring minikube
+
+If you don't have (or want) virtualbox installed, and are running linux, run this to use KVMs: `minikube config set vm-driver kvm2`
+
+
+
+### Developing
+
+To deploy to your local minikube cluster you need to ensure `eval <(minikube docker-env)` to set. If you're using zsh with autoenv you'll get this automatically via the `.in` file (and will be unset when you `cd` out via `.out`)
+
+# Original README (via empty-sdm)
 
 [![atomist sdm goals](http://badge.atomist.com/T29E48P34/atomist-seeds/empty-sdm/c796f715-67c3-48ae-8b7c-45c0fd31443f)](https://app.atomist.com/workspace/T29E48P34)
 [![npm version](https://img.shields.io/npm/v/@atomist-seeds/empty-sdm.svg)](https://www.npmjs.com/package/@atomist-seeds/empty-sdm)
