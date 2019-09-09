@@ -12,7 +12,7 @@ Please make sure you have installed:
 
 If you don't have (or want) virtualbox installed, and are running linux, run this to use KVMs: `minikube config set vm-driver kvm2`
 
-You might need to set the default memory and CPUs to be higher than default (1GB and 1 respectively): `minikube config set {memory 8196; ,cpus 8}`
+You might need to set the default memory and CPUs to be higher than default (1GB and 1 respectively): `minikube config set memory 8196; minikube config set cpus 8`
 
 ### Developing
 
