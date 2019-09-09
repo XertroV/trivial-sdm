@@ -1,0 +1,5 @@
+docker_env_cmds="$(minikube docker-env)"
+
+if [[ "$docker_env" != "" ]]; then
+    eval "$docker_env_cmds"
+fi

@@ -55,6 +55,7 @@ export const configuration = configure<AllDefinedGoals>(async (sdm) => {
         },
         k8sDeploy: {
             dependsOn: ["dockerBuild"],
+            test: HasDockerfile,
             goals: [
                 [goals.k8sDeploy],
             ],

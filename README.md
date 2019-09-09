@@ -6,17 +6,17 @@ Please make sure you have installed:
 
 * node + npm
 * docker
-* minikube
+* minikube (other kubernetes impls should work too - if you do use minikube configure this as per below before running `minikube start`)
 
 ### Configuring minikube
 
 If you don't have (or want) virtualbox installed, and are running linux, run this to use KVMs: `minikube config set vm-driver kvm2`
 
-
+You might need to set the default memory and CPUs to be higher than default (1GB and 1 respectively): `minikube config set {memory 8196; ,cpus 8}`
 
 ### Developing
 
-To deploy to your local minikube cluster you need to ensure `eval <(minikube docker-env)` to set. If you're using zsh with autoenv you'll get this automatically via the `.in` file (and will be unset when you `cd` out via `.out`)
+To deploy to your local minikube cluster you need to ensure `eval $(minikube docker-env)` to set. If you're using zsh with autoenv you'll get this automatically via the `.in` file (and will be unset when you `cd` out via `.out`)
 
 # Original README (via empty-sdm)
 
