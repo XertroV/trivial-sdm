@@ -14,11 +14,13 @@
  * limitations under the License.
  */
 
-import { goal } from "@atomist/sdm";
+import { goal, doWithProject } from "@atomist/sdm";
 import { GoalCreator, Version } from "@atomist/sdm-core";
-import { HelloWorldGoals, DockerBuildGoals, AllDefinedGoals, DockerDeployGoals, K8sDeployGoals } from "./goals";
+import { HelloWorldGoals, DockerBuildGoals, AllDefinedGoals, DockerDeployGoals, K8sDeployGoals, JenkinsBuildGoals } from "./goals";
 import { DockerBuild, DockerDeploy, DockerPerBranchDeployer } from "@atomist/sdm-pack-docker";
 import { KubernetesDeploy } from "@atomist/sdm-pack-k8s";
+import { jenkinsRun } from "@atomist/sdm-pack-jenkins";
+import { logger } from "@atomist/automation-client";
 
 /**
  * Create all goal instances and return an instance of HelloWorldGoals
@@ -53,6 +55,30 @@ export const K8sDeployGoalCreator: GoalCreator<K8sDeployGoals> = async sdm => {
     }
 }
 
+export const JenkinsBuildGoalCreator: GoalCreator<JenkinsBuildGoals> = async sdm => {
+    return {
+        jenkinsBuild: jenkinsRun("jenkins-build", {
+            server: {
+                url: process.env.JENKINS_URL || "http://127.0.0.1:18080",
+                user: process.env.JENKINS_USER || "admin",
+                password: process.env.JENKINS_PASSWORD || "1102e35aee7cdeec705a864c8a8f833a54",  // TEST CREDENTIALS FOR LOCAL JENKINS IN DOCKER
+            },
+            job: 'test-pl',
+            // job: async gi => `${gi.goalEvent.repo.name}-build`,
+                // `${gi.goalEvent.repo.owner}/${gi.goalEvent.repo.name}-build-${gi.goalEvent.sha.slice(0,16)}`,
+            // definition: async gi => {
+            //     return await gi.configuration.sdm.projectLoader.doWithProject({
+            //         credentials: gi.credentials,
+            //         id: gi.id,
+            //         readOnly: false
+            //     }, async pa => {
+            //         const jenkinsfile = await (await pa.getFile('Jenkinsfile')).getContent()
+            //         return content
+            //     })
+            // }
+        })
+    }
+}
 
 export const AllDefinedGoalsCreator: GoalCreator<AllDefinedGoals> = async sdm => {
     return {
@@ -60,5 +86,6 @@ export const AllDefinedGoalsCreator: GoalCreator<AllDefinedGoals> = async sdm =>
         ...(await DockerBuildGoalCreator(sdm)),
         ...(await DockerDeployGoalCreator(sdm)),
         ...(await K8sDeployGoalCreator(sdm)),
+        // ...(await JenkinsBuildGoalCreator(sdm)),
     }
 }

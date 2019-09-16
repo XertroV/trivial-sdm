@@ -18,6 +18,7 @@ import { GoalWithFulfillment } from "@atomist/sdm";
 import { AllGoals, Version } from "@atomist/sdm-core";
 import { DockerBuild, DockerDeploy } from "@atomist/sdm-pack-docker";
 import { KubernetesDeploy } from "@atomist/sdm-pack-k8s";
+import { jenkinsRun } from "@atomist/sdm-pack-jenkins";
 
 /**
  * Interface to capture all goals that this SDM will manage
@@ -42,4 +43,9 @@ export interface K8sDeployGoals extends AllGoals {
     k8sDeploy: KubernetesDeploy;
 }
 
-export interface AllDefinedGoals extends DockerBuildGoals, DockerDeployGoals, K8sDeployGoals {}
+type Jenkins = ReturnType<typeof jenkinsRun>;
+export interface JenkinsBuildGoals extends AllGoals {
+    jenkinsBuild: Jenkins;
+}
+
+export interface AllDefinedGoals extends DockerBuildGoals, DockerDeployGoals, K8sDeployGoals /*,JenkinsBuildGoals*/ {}

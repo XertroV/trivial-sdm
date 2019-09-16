@@ -14,11 +14,11 @@
  * limitations under the License.
  */
 
-import { AnyPush, SoftwareDeliveryMachineConfiguration, SoftwareDeliveryMachine, or, IsPushToBranchWithPullRequest, and } from "@atomist/sdm";
+import { AnyPush, SoftwareDeliveryMachineConfiguration, SoftwareDeliveryMachine, or, IsPushToBranchWithPullRequest, and, hasFile } from "@atomist/sdm";
 import { configure } from "@atomist/sdm-core";
-import { HelloWorldGoalConfigurer, AllDefinedGoalConfigurers } from "./lib/goals/goalConfigurer";
-import { HelloWorldGoalCreator, AllDefinedGoalsCreator } from "./lib/goals/goalCreator";
-import { HelloWorldGoals, AllDefinedGoals } from "./lib/goals/goals";
+import { AllDefinedGoalConfigurers } from "./lib/goals/goalConfigurer";
+import { AllDefinedGoalsCreator } from "./lib/goals/goalCreator";
+import { AllDefinedGoals } from "./lib/goals/goals";
 import { HasDockerfile } from "@atomist/sdm-pack-docker";
 
 /**
@@ -45,6 +45,12 @@ export const configuration = configure<AllDefinedGoals>(async (sdm) => {
             goals: [
                 [goals.dockerVersioning],
                 [goals.dockerBuild],
+            ]
+        },
+        jenkinsBuild: {
+            test: hasFile('Jenkinsfile'),
+            goals: [
+                [goals.jenkinsBuild]
             ]
         },
         dockerDeploy: {

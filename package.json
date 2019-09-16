@@ -31,6 +31,7 @@
     "@atomist/sdm-pack-docker": "^2.0.2",
     "@atomist/sdm-pack-fingerprint": "^5.0.0-master.20190903062633",
     "@atomist/sdm-pack-fingerprints": "^4.0.4",
+    "@atomist/sdm-pack-jenkins": "0.1.0-master.20190604195525",
     "@atomist/sdm-pack-k8s": "^1.9.0"
   },
   "devDependencies": {
@@ -70,6 +71,7 @@
     "lint": "tslint --config tslint.json --format verbose --project .",
     "lint:fix": "npm run lint -- --fix",
     "start": "atm-start",
+    "start:dev": "watch.sh -e 'node_modules/.*' -i '*.js' -c 'atomist start --local --no-compile'",
     "test": "mocha --require espower-typescript/guess \"test/**/*.test.ts\"",
     "test:one": "mocha --require espower-typescript/guess \"test/**/${TEST:-*.test.ts}\"",
     "typedoc": "npm run doc"

@@ -1,18 +1,47 @@
-# trivial-sdm (based on @atomist-seeds/empty-sdm)
+# cba-sdm-example
+
+A refactor of the PoC to use best practices (early draft).
 
 ## Getting Started
 
-Please make sure you have installed:
+For local dev (with support for building + deploying) please make sure you have installed:
 
-* node + npm
+* node (v10+) + npm
 * docker
 * minikube (other kubernetes impls should work too - if you do use minikube configure this as per below before running `minikube start`)
 
-### Configuring minikube
+### Configuring docker and minikube
 
 If you don't have (or want) virtualbox installed, and are running linux, run this to use KVMs: `minikube config set vm-driver kvm2`
 
 You might need to set the default memory and CPUs to be higher than default (1GB and 1 respectively): `minikube config set memory 8196; minikube config set cpus 8`
+
+Proxies can be quite frustrating to configure. Some links:
+
+* [kubectl](https://kubernetes.io/docs/tasks/tools/install-kubectl/)
+* [minikube](https://minikube.sigs.k8s.io/docs/start/) -- [setup](https://kubernetes.io/docs/tutorials/hello-minikube/) -- [proxy1](https://minikube.sigs.k8s.io/docs/reference/networking/proxy/); [proxy2](https://kubernetes.io/docs/setup/learning-environment/minikube/#using-minikube-with-an-http-proxy); [proxy3](https://codefarm.me/2018/08/09/http-proxy-docker-minikube/); [docs](https://minikube.sigs.k8s.io/docs/); [using kvm](https://computingforgeeks.com/how-to-run-minikube-on-kvm/)
+
+You'll want to have the CNTLM local proxy set up. In relevant terminals (suggestion: add to `~/.bashrc` or equiv):
+
+```bash
+export http{,s}_proxy=http://127.0.0.1:3128
+export HTTP{,S}_PROXY=http://127.0.0.1:3128
+export {NO_PROXY,no_proxy}=localhost,127.0.0.1,::1
+```
+
+To add this globally to all shells:
+
+```bash
+cat | sudo tee -a /etc/profile << EOF
+export http{,s}_proxy=http://127.0.0.1:3128
+export HTTP{,S}_PROXY=http://127.0.0.1:3128
+export {NO_PROXY,no_proxy}=localhost,127.0.0.1,::1
+EOF
+```
+
+In a new terminal session you can confirm the global config works via `env | grep -i proxy` (should return 6 lines matching the above)
+
+You'll want to add these variables to `docker`'s environment too. For linux this is easy ([instructions](https://codefarm.me/2018/08/09/http-proxy-docker-minikube/)), if you do this on macos please update this readme with instructions.
 
 ### Developing
 

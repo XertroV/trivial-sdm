@@ -15,7 +15,10 @@
  */
 
 import { GoalConfigurer, Version, goalScheduling } from "@atomist/sdm-core";
-import { HelloWorldGoals, DockerBuildGoals, AllDefinedGoals, DockerDeployGoals, K8sDeployGoals } from "./goals";
+import { HelloWorldGoals, DockerBuildGoals, AllDefinedGoals, DockerDeployGoals, K8sDeployGoals, JenkinsBuildGoals } from "./goals";
+import { JenkinsRegistration } from "@atomist/sdm-pack-jenkins";
+import { SdmGoalEvent } from "@atomist/sdm";
+import { logger } from "@atomist/automation-client";
 
 /**
  * Configure the SDM and add fulfillments or listeners to the created goals
@@ -39,8 +42,8 @@ export const HelloWorldGoalConfigurer: GoalConfigurer<HelloWorldGoals> = async (
 
 export const DockerBuildGoalConfigurer: GoalConfigurer<DockerBuildGoals> = async (sdm, goals) => {
     goals.dockerVersioning.with({versioner: async (v) => { return v.sha }});
-    goals.dockerBuild.with({ 
-        push: false, 
+    goals.dockerBuild.with({
+        push: false,
         dockerImageNameCreator: async (gitProject, event, dockerOptions) => {
             const shortSha = event.sha.slice(0,16);
             return [{
@@ -48,7 +51,7 @@ export const DockerBuildGoalConfigurer: GoalConfigurer<DockerBuildGoals> = async
                 name: `${event.repo.owner.toLowerCase()}-${event.repo.name.toLowerCase()}`,
                 tags: [shortSha, `${Date.now()}`, 'latest'],
             }]
-        } 
+        }
     });
 }
 
@@ -65,16 +68,6 @@ export const K8sDeployGoalConfigurer: GoalConfigurer<K8sDeployGoals> = async (sd
                 "nginx.ingress.kubernetes.io/rewrite-target": "/",
                 "nginx.ingress.kubernetes.io/ssl-redirect": "false",
             }
-            // ka.ingressSpec = {
-            //     metadata:
-            //     {
-            //         annotations: {
-            //             "kubernetes.io / ingress.class": "nginx",
-            //             "nginx.ingress.kubernetes.io / rewrite - target": "/",
-            //             "nginx.ingress.kubernetes.io / ssl - redirect": "false",
-            //         }
-            //     }
-            // }
 
             ka.ingressSpec = {}
             ka.ingressSpec.metadata = {annotations}
@@ -92,22 +85,41 @@ export const K8sDeployGoalConfigurer: GoalConfigurer<K8sDeployGoals> = async (sd
                             spec: {
                                 containers:
                                     [{ imagePullPolicy: "Never" }],
-                                
+
                             }
                         }
                     }
                 },
             }
-        } 
+        }
     })
 }
 
 
+const genJenkinsBuildName = (goalEvent: SdmGoalEvent) => `${goalEvent.repo.owner}/${goalEvent.repo.name}-build-${goalEvent.sha.slice(0,16)}`
+
+export const JenkinsBuildGoalConfigurer: GoalConfigurer<JenkinsBuildGoals> = async (sdm, goals) => {
+    const jenkinsRego: Pick<JenkinsRegistration, "server"> = {
+        server: {
+            url: process.env.JENKINS_URL || "http://127.0.0.1:18080",
+            user: process.env.JENKINS_USER || "admin",
+            password: process.env.JENKINS_PASSWORD || "admin",
+        }
+    }
+
+    // goals.jenkinsBuild.with({
+    //     ...jenkinsRego,
+    //     job: async gi => genJenkinsBuildName(gi.goalEvent), // `${gi.goalEvent.repo.owner}/${gi.goalEvent.repo.name}-build-${gi.goalEvent.sha.slice(0,16)}`
+    // })
+}
+
+
 export const AllDefinedGoalConfigurers: GoalConfigurer<AllDefinedGoals> = async (sdm, goals) => {
-    const configurers = 
+    const configurers =
         [ DockerBuildGoalConfigurer
         , DockerDeployGoalConfigurer
         , K8sDeployGoalConfigurer
+        // , JenkinsBuildGoalConfigurer
         ];
     await Promise.all(configurers.map(c => c(sdm, goals)))
 }
